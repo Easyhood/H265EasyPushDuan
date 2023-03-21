@@ -109,10 +109,10 @@ public class CodecLiveH264 extends Thread{
         int type = (bb.get(offset) & 0x1F);
         // sps 只会输出一份 非常宝贵
         if (NAL_SPS == type) {
-            sps_pps_buf = new byte[bufferInfo.size];
+            sps_pps_buf = new byte[bb.remaining()];
             bb.get(sps_pps_buf);
         } else if (NAL_I == type) {
-            final byte[] bytes = new byte[bufferInfo.size];
+            final byte[] bytes = new byte[bb.remaining()];
             // 45459
             bb.get(bytes);
             byte[] newBuf = new byte[sps_pps_buf.length + bytes.length];
@@ -120,7 +120,7 @@ public class CodecLiveH264 extends Thread{
             System.arraycopy(bytes, 0, newBuf, sps_pps_buf.length, bytes.length);
             socketLive.sendData(newBuf);
         } else {
-            final byte[] bytes = new byte[bufferInfo.size];
+            final byte[] bytes = new byte[bb.remaining()];
             bb.get(bytes);
             this.socketLive.sendData(bytes);
             Log.d(TAG, "dealFrame: 视频数据 = " + Arrays.toString(bytes));
